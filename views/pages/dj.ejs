@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/head'); %>
+  </head>
+  <body>
+    <div class="container">
+      <%- include('../partials/sidebar'); %>
+      <main class="main-content">
+        <%- include('../partials/select-showtime'); %>
+        <div class="search-bar"><%- include('../partials/search-bar'); %></div>
+        <section class="playlists">
+          <div class="tabs-container"><%- include('../partials/tabs'); %></div>
+          <div class="playlists-container">
+            <div class="content-list active">
+              <% songs.forEach(function(song) { %>
+              <div class="song-container">
+                <div class="song-cover">
+                  <img src="<%= song.cover %>" alt="" />
+                </div>
+                <div class="song-title">
+                  <h6><%= song.title %></h6>
+                  <p><%= song.artists %></p>
+                </div>
+                <i class="<%= deleteSong %>"></i>
+              </div>
+              <hr />
+              <% }); %>
+            </div>
+            <div class="content-list">
+              <% playlists.forEach(function(playlist) { %>
+              <div class="song-container">
+                <div class="song-cover">
+                  <img src="<%= playlist.cover %>" alt="" />
+                </div>
+                <div class="song-title">
+                  <h6><%= playlist.title %></h6>
+                </div>
+              </div>
+              <hr />
+              <% }); %>
+            </div>
+            <div class="content-list prev-songs">
+              <% previousSongs.forEach(function(prevSong) { %>
+              <div class="song-container">
+                <div class="song-cover">
+                  <img src="<%= prevSong.cover %>" alt="" />
+                </div>
+                <div class="song-title">
+                  <h6><%= prevSong.title %></h6>
+                  <p><%= prevSong.artists %></p>
+                </div>
+                <i class="<%= addSong %>"></i>
+              </div>
+              <hr />
+              <% }); %>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <%- include('../partials/script'); %>
+  </body>
+</html>
