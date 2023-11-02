@@ -6,6 +6,8 @@ app.set("view engine", "ejs");
 app.use(express.static("public"));
 
 app.get("/", function (req, res) {
+  var username = "DJ User";
+
   let songs = [
     {
       cover: "images/for-all-the-dogs.png",
@@ -144,11 +146,22 @@ app.get("/", function (req, res) {
     previousSongs: previousSongs,
     deleteSong: deleteSong,
     addSong: addSong,
+    username: username,
   });
 });
 
 app.get("/producer", function (req, res) {
-  res.render("pages/producer");
+  var username = "Producer User";
+  res.render("pages/producer", {
+    username: username,
+  });
+});
+
+app.get("/listener", function (req, res) {
+  var username = "Jimmy";
+  res.render("pages/listener", {
+    username: username,
+  });
 });
 
 app.listen(port, () => {
