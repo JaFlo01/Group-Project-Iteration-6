@@ -1,4 +1,3 @@
-let pageLoaded = false;
 const tabs = document.querySelectorAll(".tabs");
 const all_content = document.querySelectorAll(".content-list");
 const songSearchInput = document.getElementById("song-search");
@@ -8,13 +7,6 @@ const prevSongsContent = document.querySelector(".prev-songs");
 const trashIcons = document.querySelectorAll(".fa-solid.fa-trash");
 const plusIcons = document.querySelectorAll(".prev-songs .fa-solid.fa-plus");
 const currentPlaylist = document.querySelector(".content-list.active");
-
-window.addEventListener("load", function () {
-  if (pageLoaded === false) {
-    window.alert("Loaded successfully!");
-    pageLoaded = true;
-  }
-});
 
 songSearchInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
@@ -39,7 +31,7 @@ playlistSearchInput.addEventListener("keydown", (event) => {
 });
 
 plusIcons.forEach((plusIcon) => {
-  plusIcon.addEventListener("click", (event) => {
+  plusIcon.addEventListener("click", async (event) => {
     const musicInfo = plusIcon.parentElement;
 
     const clonedMusicInfo = musicInfo.cloneNode(true);
@@ -51,22 +43,48 @@ plusIcons.forEach((plusIcon) => {
     );
 
     if (confirmation === true) {
-      currentPlaylist.appendChild(clonedMusicInfo);
-      alert("The song has been added!");
+      try {
+        const songFetched = await fetch("/add-song", {
+          method: "POST",
+        });
+
+        if (songFetched.ok) {
+          currentPlaylist.appendChild(clonedMusicInfo);
+          alert("Song was successfully added!");
+        } else {
+          alert("Error adding song to the database. Try again.");
+        }
+      } catch (err) {
+        console.log(err);
+      }
     }
   });
 });
 
 trashIcons.forEach((trashIcon) => {
-  trashIcon.addEventListener("click", (event) => {
+  trashIcon.addEventListener("click", async (event) => {
     const musicInfo = trashIcon.parentElement;
+    const songId = musicInfo.dataset.songId;
 
     const confirmation = confirm(
       "Are you sure you want to delete this song from your current playlist?"
     );
 
     if (confirmation === true) {
-      musicInfo.remove();
+      try {
+        const songFetched = await fetch(`/delete-song/${songId}`, {
+          method: "DELETE",
+        });
+
+        if (songFetched.ok) {
+          musicInfo.remove();
+          alert("Song was successfully deleted!");
+        } else {
+          alert("Error deleting song. Please try again.");
+        }
+      } catch (err) {
+        console.error(err);
+      }
     }
   });
 });

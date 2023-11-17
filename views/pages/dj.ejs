@@ -14,7 +14,7 @@
           <div class="playlists-container">
             <div class="content-list active">
               <% songs.forEach(function(song) { %>
-              <div class="song-container">
+              <div class="song-container" data-song-id="<%= song._id %>">
                 <div class="song-cover">
                   <img src="<%= song.cover %>" alt="" />
                 </div>

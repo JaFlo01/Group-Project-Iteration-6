@@ -1,14 +1,39 @@
 const express = require("express");
 const app = express();
+const mongoose = require("mongoose");
+const session = require("express-session");
 const port = 8080;
 
-app.set("view engine", "ejs");
-app.use(express.static("public"));
+main().catch((err) => console.log(err));
 
-app.get("/", function (req, res) {
-  var username = "DJ User";
+async function main() {
+  await mongoose.connect("mongodb://127.0.0.1:27017/radioStationDB");
+  console.log("Connected to DB");
 
-  let songs = [
+  app.set("view engine", "ejs");
+  app.use(express.static("public"));
+  app.use(express.json());
+  app.use(
+    session({
+      secret: "DJ952",
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        maxAge: 1800000,
+        sameSite: "session",
+      },
+    })
+  );
+
+  const songSchema = new mongoose.Schema({
+    cover: String,
+    title: String,
+    artists: String,
+  });
+
+  const Song = mongoose.model("Song", songSchema);
+
+  const songs = [
     {
       cover: "images/for-all-the-dogs.png",
       title: "IDGAF",
@@ -61,7 +86,22 @@ app.get("/", function (req, res) {
     },
   ];
 
-  let playlists = [
+  const alreadyDocumented = await Song.find({});
+  if (alreadyDocumented.length === 0) {
+    for (const currentSong of songs) {
+      const newSong = new Song(currentSong);
+      await newSong.save();
+    }
+  }
+
+  const playlistSchema = new mongoose.Schema({
+    cover: String,
+    title: String,
+  });
+
+  const Playlist = mongoose.model("Playlist", playlistSchema);
+
+  const playlists = [
     {
       cover: "images/playlist-1.jpg",
       title: "PLAYLIST 1",
@@ -104,52 +144,112 @@ app.get("/", function (req, res) {
     },
   ];
 
-  let previousSongs = [
-    {
-      cover: "images/lean-wit-me.jpg",
-      title: "Lean Wit Me",
-      artists: "Juice WRLD",
-    },
-    {
-      cover: "images/look-at-me.jpg",
-      title: "Look At Me!",
-      artists: "XXXTENTACION",
-    },
-    {
-      cover: "images/the-grinch.jpeg",
-      title: "The Grinch",
-      artists: "Trippie Redd",
-    },
-    {
-      cover: "images/flex-up.jpg",
-      title: "Flex Up (feat. Future & Playboi Carti)",
-      artists: "Lil Yachty, Future, Playboi Carti",
-    },
-    {
-      cover: "images/church-in-the-wild.jpeg",
-      title: "No Church In The Wild",
-      artists: "JAY-Z, Kanye West,Frank Ocean, The-Dream",
-    },
-    {
-      cover: "images/n95.jpg",
-      title: "N95",
-      artists: "Kendrick Lamar",
-    },
-  ];
+  const playlistDocumented = await Playlist.find({});
+  if (playlistDocumented.length === 0) {
+    for (const currentPlaylist of playlists) {
+      const newPlaylist = new Playlist(currentPlaylist);
+      await newPlaylist.save();
+    }
+  }
 
-  const deleteSong = "fa-solid fa-trash";
-  const addSong = "fa-solid fa-plus";
+  app.get("/", async function (req, res) {
+    var username = "DJ User";
 
-  res.render("pages/dj", {
-    songs: songs,
-    playlists: playlists,
-    previousSongs: previousSongs,
-    deleteSong: deleteSong,
-    addSong: addSong,
-    username: username,
+    try {
+      const songs = await Song.find({});
+
+      let previousSongs = [
+        {
+          cover: "images/lean-wit-me.jpg",
+          title: "Lean Wit Me",
+          artists: "Juice WRLD",
+        },
+        {
+          cover: "images/look-at-me.jpg",
+          title: "Look At Me!",
+          artists: "XXXTENTACION",
+        },
+        {
+          cover: "images/the-grinch.jpeg",
+          title: "The Grinch",
+          artists: "Trippie Redd",
+        },
+        {
+          cover: "images/flex-up.jpg",
+          title: "Flex Up (feat. Future & Playboi Carti)",
+          artists: "Lil Yachty, Future, Playboi Carti",
+        },
+        {
+          cover: "images/church-in-the-wild.jpeg",
+          title: "No Church In The Wild",
+          artists: "JAY-Z, Kanye West,Frank Ocean, The-Dream",
+        },
+        {
+          cover: "images/n95.jpg",
+          title: "N95",
+          artists: "Kendrick Lamar",
+        },
+      ];
+
+      const deleteSong = "fa-solid fa-trash";
+      const addSong = "fa-solid fa-plus";
+      const userPlaylist = req.session.playlist;
+
+      res.render("pages/dj", {
+        songs: songs,
+        playlists: playlists,
+        previousSongs: previousSongs,
+        deleteSong: deleteSong,
+        addSong: addSong,
+        username: username,
+        userPlaylist: userPlaylist,
+      });
+    } catch (err) {
+      console.log(err);
+      alert("Error retrieving data.");
+    }
   });
-});
 
+  app.post("/add-song", async function (req, res) {
+    const { cover, title, artists } = req.body;
+
+    try {
+      const alreadyAdded = await Song.findOne({ title, artists });
+
+      if (alreadyAdded) {
+        res
+          .status(200)
+          .json({ message: "Song was already added to the database." });
+      } else {
+        const newSong = new Song({ cover, title, artists });
+        await newSong.save();
+        res
+          .status(200)
+          .json({ message: "Song was successfully added to the database!" });
+      }
+      req.session.playlist.push({ cover, title, artists });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Error with internal server" });
+    }
+  });
+
+  app.delete("/delete-song/:id", async function (req, res) {
+    const songId = req.params.id;
+
+    try {
+      const deletedSong = await Song.findOneAndDelete({ _id: songId });
+
+      if (deletedSong) {
+        res.status(200).json({ message: "Song was successfully deleted." });
+      } else {
+        res.status(404).json({ message: "Song to delete not found." });
+      }
+    } catch (err) {
+      res.status(500).json({ message: "Error with internal server" });
+    }
+  });
+}
 app.get("/producer", function (req, res) {
   var username = "Producer User";
   res.render("pages/producer", {
