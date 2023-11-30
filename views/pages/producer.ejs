@@ -3,11 +3,11 @@
   <head>
     <title>Radio Website</title>
     <link rel="stylesheet" href="stylesheet.css" />
-    <script src="producer_script.js"></script>
+    <script src="script.js"></script>
   </head>
   <body>
     <div class="sidebar">
-      <img src="images/sample_img.webp" alt="Profile Picture" class="pfp" />
+      <img src="img/sample_img.webp" alt="Profile Picture" class="pfp" />
       <p style="font-size: 20px; text-align: center"><%= username %></p>
       <a href="#playlist">Current Playlist</a>
       <a href="#add_songs">Add Songs</a>
@@ -19,130 +19,128 @@
         <!-- Current Playlist Block-->
         <h1>Current Playlist</h1>
         <div class="container" id="playlist-container">
-          <div class="song">
-            <img src="images/sample_img.webp" class="album-art" />
-            A song
-            <audio controls>
-              <source src="aud/nice_sound.mp3" type="audio/mp3" />
-            </audio>
-          </div>
+          <!-- Songs will be displayed here -->
         </div>
       </div>
+      <script>
+        async function fetchSongDetailsById(songId) {
+          // Gets a song object when given a songId
+          try {
+            const response = await fetch(`/database/songs/${songId}`);
+            if (!response.ok) {
+              throw new Error("Network response was not ok.");
+            }
+            const song = await response.json();
+            return song;
+          } catch (error) {
+            console.error("Error fetching song:", error);
+            return null;
+          }
+        }
+
+        function display_selected_songs() {
+          const playlistContainer =
+            document.getElementById("playlist-container");
+          playlistContainer.innerHTML = "";
+          selectedSongs.forEach(async (songId) => {
+            const songDetails = await fetchSongDetailsById(songId);
+            if (songDetails) {
+              const songDiv = document.createElement("div");
+              songDiv.classList.add("song");
+              const img = document.createElement("img");
+              img.src = songDetails.album_art;
+              img.classList.add("album-art");
+              songDiv.appendChild(img);
+              const songTitle = document.createElement("p");
+              songTitle.textContent = songDetails.title;
+              songTitle.classList.add("inline");
+              songDiv.appendChild(songTitle);
+              playlistContainer.appendChild(songDiv);
+            } else {
+              console.log("Song details not found or error fetching.");
+            }
+          });
+        }
+      </script>
       <!-- Song Add Block -->
       <div>
         <h1>Add Songs</h1>
-        <form id="song_form">
-          <!-- TODO: Implement search functionality-->
-          <label for="song_search">Search:</label>
-          <input type="text" id="song_search" name="song_search" />
-          <input type="submit" value="Submit" />
-        </form>
+        <div class="container" id="add_song_container">
+          <!-- Songs will be displayed here -->
+        </div>
         <script>
-          document.getElementById("song_form").onsubmit = function (event) {
-            var inputField = document.getElementById("song_search");
-            if (inputField.value.trim() === "") {
-              alert("Please enter a song title.");
-              event.preventDefault();
+          // Fetch and display songs
+          async function display_songs() {
+            try {
+              const response = await fetch("/database/songs");
+              const songs = await response.json();
+              const songs_container =
+                document.getElementById("add_song_container");
+              songs.forEach((song) => {
+                const song_div = document.createElement("div");
+                song_div.classList.add("song");
+                const img = document.createElement("img");
+                img.src = song.album_art;
+                img.classList.add("album-art");
+                song_div.appendChild(img);
+                const song_title = document.createElement("p");
+                song_title.textContent = song.title;
+                song_title.classList.add("inline");
+                song_div.appendChild(song_title);
+                const add_button = document.createElement("img");
+                add_button.src = "img/add.png";
+                add_button.classList.add("add-button");
+                add_button.onclick = function () {
+                  const songId = song._id;
+                  selectedSongs.push(songId);
+                  console.log(selectedSongs);
+                  localStorage.setItem(
+                    "selectedSongs",
+                    JSON.stringify(selectedSongs)
+                  );
+                  display_selected_songs();
+                };
+                song_div.appendChild(add_button);
+                songs_container.appendChild(song_div);
+              });
+            } catch (err) {
+              console.error(err);
+            }
+          }
+          window.onload = display_songs();
+          window.onload = function () {
+            const storedSongs = JSON.parse(
+              localStorage.getItem("selectedSongs")
+            );
+            if (storedSongs) {
+              selectedSongs = storedSongs;
+              display_selected_songs();
             }
           };
         </script>
-        <div class="container">
-          <div class="song">
-            <img src="images/sample_img.webp" class="album-art" />
-            A bad song
-            <audio controls>
-              <source src="aud/public_and_nice_sound.mp3" type="audio/mp3" />
-            </audio>
-            <img
-              src="images/add.png"
-              class="album-art"
-              onclick="addSong(this)"
-            />
-          </div>
-          <div class="song">
-            <img src="images/sample_img.webp" class="album-art" />
-            A great song
-            <audio controls>
-              <source src="aud/nice_sound.mp3" type="audio/mp3" />
-            </audio>
-            <img
-              src="images/add.png"
-              class="album-art"
-              onclick="addSong(this)"
-            />
-          </div>
-          <div class="song">
-            <img src="images/sample_img.webp" class="album-art" />
-            A happy song
-            <audio controls>
-              <source src="aud/nice_sound.mp3" type="audio/mp3" />
-            </audio>
-            <img
-              src="images/add.png"
-              class="album-art"
-              onclick="addSong(this)"
-            />
-          </div>
-          <div class="song">
-            <img src="images/sample_img.webp" class="album-art" />
-            A weird song
-            <audio controls>
-              <source src="aud/nice_sound.mp3" type="audio/mp3" />
-            </audio>
-            <img
-              src="images/add.png"
-              class="album-art"
-              onclick="addSong(this)"
-            />
-          </div>
-          <div class="song">
-            <img src="images/sample_img.webp" class="album-art" />
-            An sad song
-            <audio controls>
-              <source src="aud/nice_sound.mp3" type="audio/mp3" />
-            </audio>
-            <img
-              src="images/add.png"
-              class="album-art"
-              onclick="addSong(this)"
-            />
-          </div>
-          <div class="song">
-            <img src="images/sample_img.webp" class="album-art" />
-            A meh song
-            <audio controls>
-              <source src="aud/nice_sound.mp3" type="audio/mp3" />
-            </audio>
-            <img
-              src="images/add.png"
-              class="album-art"
-              onclick="addSong(this)"
-            />
-          </div>
-        </div>
       </div>
       <!-- Select DJ Block -->
       <div>
         <h1>Select DJ</h1>
         <div class="container">
           <div class="dj" onclick="toggleActive(this)">
-            <img src="images/sample_img.webp" class="album-art" />
+            <img src="img/sample_img.webp" class="album-art" />
             DJ Bunny
           </div>
           <div class="dj" onclick="toggleActive(this)">
-            <img src="images/sample_img.webp" class="album-art" />
+            <img src="img/sample_img.webp" class="album-art" />
             DJ Rabbit
           </div>
           <div class="dj" onclick="toggleActive(this)">
-            <img src="images/sample_img.webp" class="album-art" />
+            <img src="img/sample_img.webp" class="album-art" />
             DJ Lagomorph
           </div>
           <div class="dj" onclick="toggleActive(this)">
-            <img src="images/sample_img.webp" class="album-art" />
+            <img src="img/sample_img.webp" class="album-art" />
             DJ Carrots
           </div>
           <div class="dj" onclick="toggleActive(this)">
-            <img src="images/sample_img.webp" class="album-art" />
+            <img src="img/sample_img.webp" class="album-art" />
             DJ Hay
           </div>
         </div>
@@ -154,7 +152,7 @@
           style="
             height: auto;
             width: 600px;
-            border: 1px solid gold;
+            border: 1px solid white;
             padding: 10px;
           "
         >
@@ -163,33 +161,26 @@
             <input type="text" id="start_time" name="start_time" />
             <label for="end_time">End Time:</label>
             <input type="text" id="end_time" name="end_time" />
-            <input
-              type="button"
-              value="Check Timeslot"
-              onclick="validateTimes()"
-            />
+            <input type="button" value="Check Timeslot" id="timeslot_button" />
           </form>
           <div id="error-popup" style="display: none">
             <p id="error-message" style="color: red"></p>
           </div>
         </div>
       </div>
-      <!-- TODO: Playlist submission when we get database setup-->
-      <button class="submit-button">Submit</button>
+      <button class="submit-button" id="submit-button">Submit</button>
       <button class="reset-button" id="reset-button">Reset</button>
 
       <script>
         document
           .getElementById("reset-button")
           .addEventListener("click", function () {
-            // Get the playlist container
             const playlistContainer =
               document.getElementById("playlist-container");
-
-            // Remove all child elements (songs) from the container
             while (playlistContainer.firstChild) {
               playlistContainer.removeChild(playlistContainer.firstChild);
             }
+            localStorage.removeItem("selectedSongs");
           });
       </script>
     </div>

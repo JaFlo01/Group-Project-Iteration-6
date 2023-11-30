@@ -19,12 +19,26 @@ async function main() {
       resave: false,
       saveUninitialized: false,
       cookie: {
-        maxAge: 1800000,
-        sameSite: "session",
+        maxAge: 1800000, //If inactivity exceeds this amount, clear the session
+        sameSite: "session", //If browser is closed, clear the session
       },
     })
   );
 
+  //Stores user's username
+  const usernameSchema = new mongoose.Schema({
+    username: String,
+  });
+
+  const Username = mongoose.model("Username", usernameSchema);
+
+  const user = new Username({
+    username: "User",
+  });
+
+  await user.save();
+
+  //Stores the initial songs in the current playlist
   const songSchema = new mongoose.Schema({
     cover: String,
     title: String,
@@ -86,6 +100,7 @@ async function main() {
     },
   ];
 
+  //Prevents duplication of songs whenever we run the server multiple times
   const alreadyDocumented = await Song.find({});
   if (alreadyDocumented.length === 0) {
     for (const currentSong of songs) {
@@ -94,6 +109,7 @@ async function main() {
     }
   }
 
+  //Stores previous playlists
   const playlistSchema = new mongoose.Schema({
     cover: String,
     title: String,
@@ -144,6 +160,7 @@ async function main() {
     },
   ];
 
+  //Prevents duplication of playlists when running the server multiple times
   const playlistDocumented = await Playlist.find({});
   if (playlistDocumented.length === 0) {
     for (const currentPlaylist of playlists) {
@@ -152,48 +169,69 @@ async function main() {
     }
   }
 
+  // Stores previous playlist songs
+  const prevSongSchema = new mongoose.Schema({
+    cover: String,
+    title: String,
+    artists: String,
+  });
+
+  const prevSong = mongoose.model("prevSong", prevSongSchema);
+
+  const previousSongs = [
+    {
+      cover: "images/lean-wit-me.jpg",
+      title: "Lean Wit Me",
+      artists: "Juice WRLD",
+    },
+    {
+      cover: "images/look-at-me.jpg",
+      title: "Look At Me!",
+      artists: "XXXTENTACION",
+    },
+    {
+      cover: "images/the-grinch.jpeg",
+      title: "The Grinch",
+      artists: "Trippie Redd",
+    },
+    {
+      cover: "images/flex-up.jpg",
+      title: "Flex Up (feat. Future & Playboi Carti)",
+      artists: "Lil Yachty, Future, Playboi Carti",
+    },
+    {
+      cover: "images/church-in-the-wild.jpeg",
+      title: "No Church In The Wild",
+      artists: "JAY-Z, Kanye West,Frank Ocean, The-Dream",
+    },
+    {
+      cover: "images/n95.jpg",
+      title: "N95",
+      artists: "Kendrick Lamar",
+    },
+  ];
+
+  //Prevents duplication of previous songs when server is run mulitple times
+  const prevSongDocumented = await prevSong.find({});
+  if (prevSongDocumented.length === 0) {
+    for (const currentSong of previousSongs) {
+      const newSong = new prevSong(currentSong);
+      await newSong.save();
+    }
+  }
+
+  //Current page / DJ page
   app.get("/", async function (req, res) {
-    var username = "DJ User";
-
     try {
+      //Read the values from the database and store them into the fields within res.render
       const songs = await Song.find({});
-
-      let previousSongs = [
-        {
-          cover: "images/lean-wit-me.jpg",
-          title: "Lean Wit Me",
-          artists: "Juice WRLD",
-        },
-        {
-          cover: "images/look-at-me.jpg",
-          title: "Look At Me!",
-          artists: "XXXTENTACION",
-        },
-        {
-          cover: "images/the-grinch.jpeg",
-          title: "The Grinch",
-          artists: "Trippie Redd",
-        },
-        {
-          cover: "images/flex-up.jpg",
-          title: "Flex Up (feat. Future & Playboi Carti)",
-          artists: "Lil Yachty, Future, Playboi Carti",
-        },
-        {
-          cover: "images/church-in-the-wild.jpeg",
-          title: "No Church In The Wild",
-          artists: "JAY-Z, Kanye West,Frank Ocean, The-Dream",
-        },
-        {
-          cover: "images/n95.jpg",
-          title: "N95",
-          artists: "Kendrick Lamar",
-        },
-      ];
-
+      const prevSongs = await prevSong.find({});
+      const user = await Username.findOne({});
       const deleteSong = "fa-solid fa-trash";
       const addSong = "fa-solid fa-plus";
-      const userPlaylist = req.session.playlist;
+      const playSong = "fa-solid fa-play";
+      const pauseSong = "fa-solid fa-pause";
+      const userPlaylist = req.session.playlist || [];
 
       res.render("pages/dj", {
         songs: songs,
@@ -201,7 +239,9 @@ async function main() {
         previousSongs: previousSongs,
         deleteSong: deleteSong,
         addSong: addSong,
-        username: username,
+        playSong: playSong,
+        pauseSong: pauseSong,
+        username: user.username,
         userPlaylist: userPlaylist,
       });
     } catch (err) {
@@ -210,30 +250,89 @@ async function main() {
     }
   });
 
+  //Create operation of CRUD.
+  //We're essentially creating a new song to the current playlist whenever we add it from a previous playlist
+  //When it gets added, a new song document is created and saved into the Song collection
   app.post("/add-song", async function (req, res) {
     const { cover, title, artists } = req.body;
 
     try {
-      const alreadyAdded = await Song.findOne({ title, artists });
+      const newSong = new Song({
+        cover: cover,
+        title: title,
+        artists: artists,
+      });
 
-      if (alreadyAdded) {
-        res
-          .status(200)
-          .json({ message: "Song was already added to the database." });
-      } else {
-        const newSong = new Song({ cover, title, artists });
-        await newSong.save();
-        res
-          .status(200)
-          .json({ message: "Song was successfully added to the database!" });
-      }
-      req.session.playlist.push({ cover, title, artists });
+      await newSong.save();
+      res.status(200).json({ message: "Song added successfully." });
     } catch (err) {
       console.error(err);
-      res.status(500).json({ message: "Error with internal server" });
+      res.status(500).json({ message: "Error adding song to the database." });
     }
   });
 
+  //Read operation of CRUD
+  //Search for songs from the list by reading it from the database
+  //If the song is found, that means it was read successfully from the Song collection
+  //If not, then it doesn't exist in the database
+  app.get("/search-song", async function (req, res) {
+    const searchTerm = req.query.searchTerm;
+
+    try {
+      const foundSongs = await Song.find({
+        title: { $regex: new RegExp(searchTerm, "i") },
+      });
+
+      res.json(foundSongs);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Error searching for songs." });
+    }
+  });
+
+  //Read operation of CRUD
+  //Search for playlists from the list by reading it from the database
+  //If the playlist is found, that means it was read successfully from the Playlist collection
+  //If not, then it doesn't exist in the database
+  app.get("/search-playlist", async function (req, res) {
+    const searchTerm = req.query.searchTerm;
+
+    try {
+      const foundPlaylists = await Playlist.find({
+        title: { $regex: new RegExp(searchTerm, "i") },
+      });
+
+      res.json(foundPlaylists);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Error searching for playlists." });
+    }
+  });
+
+  //Update operation of CRUD
+  //We update the username with whatever the user enters
+  //The page starts with "user" as the username, it then gets replaced in the UI and database with
+  //any other name the user inputs
+  app.post("/update-username", async function (req, res) {
+    const newUsername = req.body.newUsername;
+
+    try {
+      const updatedUser = await Username.findOneAndUpdate(
+        {},
+        { username: newUsername },
+        { new: true }
+      );
+
+      res.status(200).json(updatedUser.username);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Error updating username." });
+    }
+  });
+
+  //Delete operation of CRUD
+  //We delete a song from the database based on its id
+  //If there's a match, it gets deleted. Otherwise, the song wasn't in the database
   app.delete("/delete-song/:id", async function (req, res) {
     const songId = req.params.id;
 
@@ -250,20 +349,28 @@ async function main() {
     }
   });
 }
+
+//Route to the producer page
 app.get("/producer", function (req, res) {
-  var username = "Producer User";
+  var username = "User";
   res.render("pages/producer", {
     username: username,
   });
 });
 
+//Route to the listener page
 app.get("/listener", function (req, res) {
-  var username = "Jimmy";
+  var username = "User";
   res.render("pages/listener", {
     username: username,
   });
 });
 
+app.get("/secret", function (req, res) {
+  res.render("pages/secret");
+});
+
+//Server runs on port 8080
 app.listen(port, () => {
   console.log("Server is running on port " + port);
 });

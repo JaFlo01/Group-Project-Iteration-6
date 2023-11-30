@@ -22,19 +22,24 @@
                   <h6><%= song.title %></h6>
                   <p><%= song.artists %></p>
                 </div>
-                <i class="<%= deleteSong %>"></i>
+                <div class="waveform"></div>
+                <i class="<%= playSong %>"></i>
+                <i class="<%= deleteSong %> delete-song"></i>
               </div>
               <hr />
               <% }); %>
             </div>
-            <div class="content-list">
+            <div class="content-list" id="playlist-section">
               <% playlists.forEach(function(playlist) { %>
-              <div class="song-container">
+              <div
+                class="song-container"
+                data-playlist-id="<%= playlist._id %>"
+              >
                 <div class="song-cover">
                   <img src="<%= playlist.cover %>" alt="" />
                 </div>
                 <div class="song-title">
-                  <h6><%= playlist.title %></h6>
+                  <h6 class="playlist-name"><%= playlist.title %></h6>
                 </div>
               </div>
               <hr />
@@ -50,7 +55,8 @@
                   <h6><%= prevSong.title %></h6>
                   <p><%= prevSong.artists %></p>
                 </div>
-                <i class="<%= addSong %>"></i>
+                <div class="waveform"></div>
+                <i class="<%= addSong %> add-song"></i>
               </div>
               <hr />
               <% }); %>

@@ -1,3 +1,4 @@
+/* General styling for whole screen begins*/
 * {
   margin: 0;
   padding: 0;
@@ -22,6 +23,10 @@ body {
   color: #fff;
 }
 
+/*-- General styling for whole screen ends--*/
+
+/* Sidebar styling begins*/
+
 .sidebar {
   position: fixed;
   width: 250px;
@@ -36,16 +41,24 @@ body {
   color: #fff;
 }
 
-.sidebar .fa-user {
-  margin-left: 80px;
+.profile {
+  margin-left: 79px;
   margin-bottom: 20px;
   margin-top: 10px;
-  font-size: 100px;
+  width: 100px;
 }
 
 .sidebar h3 {
   text-align: center;
   margin-bottom: 10px;
+}
+
+.fa-user-edit {
+  margin-top: 10px;
+  margin-bottom: 20px;
+  margin-left: 120px;
+  font-size: 16px;
+  cursor: pointer;
 }
 
 .sidebar a {
@@ -71,12 +84,18 @@ body {
   background-color: #371d25;
 }
 
+/*-- Sidebar styling  ends--*/
+
+/* Main content styling begins */
+
 .main-content {
   margin-top: 20px;
   margin-left: 320px;
   padding: 10px 10px;
   width: 100vw;
 }
+
+/* Schedule selection section styling begins */
 
 .select-showtime {
   margin-bottom: 50px;
@@ -128,6 +147,9 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   opacity: 0;
 }
 
+/*-- Schedule selection section styling ends --*/
+
+/* Playlists styling begins */
 .playlists {
   width: 1000px;
   background: linear-gradient(
@@ -167,7 +189,7 @@ input[type="text"] {
 .tabs-container .tabs {
   font-size: 18px;
   font-weight: 600px;
-  color: #fff;
+  color: #919191;
   background: none;
   border: none;
   padding: 18px;
@@ -175,7 +197,7 @@ input[type="text"] {
 }
 
 .tabs-container .tabs.active {
-  color: #919191;
+  color: #fff;
 }
 
 .playlists-container .content-list {
@@ -196,12 +218,20 @@ input[type="text"] {
 }
 
 .playlists-container .content-list.active .fa-trash,
-.playlists-container .content-list.active .fa-plus {
+.playlists-container .content-list.active .fa-plus,
+.playlists-container .content-list.active .fa-play,
+.playlists-container .content-list.active .fa-pause,
+.prev-songs .fa-plus {
   margin-right: 10px;
   margin-left: auto;
   font-size: 22px;
   color: #d3d3d3;
   cursor: pointer;
+}
+
+.playlists-container .content-list.active .fa-play,
+.playlists-container .content-list.active .fa-pause {
+  margin-left: 230px;
 }
 
 .song-container {
@@ -246,10 +276,5 @@ input[type="text"] {
   cursor: pointer;
 }
 
-.playlists-container .content-list h2 {
-  margin-bottom: 10px;
-}
-
-.playlists-container .prev-songs.active {
-  display: none;
-}
+/*-- Main content styling ends --*/
+/*-- Playlists styling ends --*/

@@ -11,17 +11,17 @@
       referrerpolicy="no-referrer"
     />
     <link rel="stylesheet" href="public/style.css" />
-    <title>DJ's Playlists</title>
+    <script src="https://unpkg.com/wavesurfer.js"></script>
+    <title>DJ</title>
   </head>
   <body>
     <div class="container">
       <div class="sidebar">
-        <i class="fa-regular fa-user"></i>
-        <h3>Username</h3>
-        <a href="#">Home</a>
+        <img class="profile" src="public/images/DJ-Khaled.webp" alt="" />
+        <h3>DJ Khaled</h3>
         <a href="#">Producer</a>
         <a href="#">Listener</a>
-        <a href="#" class="current-page">DJ's Playlists</a>
+        <a href="#" class="current-page">DJ</a>
       </div>
       <main class="main-content">
         <section class="select-showtime">
@@ -51,7 +51,6 @@
             placeholder="Search for a playlist"
           />
         </div>
-
         <section class="playlists">
           <div class="tabs-container">
             <button class="tabs active">Current Playlist</button>
@@ -70,6 +69,8 @@
                   <h6>IDGAF</h6>
                   <p>Drake, Yeat</p>
                 </div>
+                <div class="waveform"></div>
+                <i class="fa-solid fa-play"></i>
                 <i class="fa-solid fa-trash"></i>
               </div>
               <hr />
@@ -81,6 +82,8 @@
                   <h6>SAY MY GRACE (feat. Travis Scott)</h6>
                   <p>Offset, Travis Scott</p>
                 </div>
+                <div class="waveform"></div>
+                <i class="fa-solid fa-play"></i>
                 <i class="fa-solid fa-trash"></i>
               </div>
               <hr />
@@ -92,6 +95,8 @@
                   <h6>MELTDOWN (feat. Drake)</h6>
                   <p>Travis Scott, Drake</p>
                 </div>
+                <div class="waveform"></div>
+                <i class="fa-solid fa-play"></i>
                 <i class="fa-solid fa-trash"></i>
               </div>
               <hr />
@@ -103,6 +108,8 @@
                   <h6>To The Bank</h6>
                   <p>Lil Wayne, Cool & Dre</p>
                 </div>
+                <div class="waveform"></div>
+                <i class="fa-solid fa-play"></i>
                 <i class="fa-solid fa-trash"></i>
               </div>
               <hr />
@@ -114,6 +121,8 @@
                   <h6>Rap Saved Me (feat. Quavo)</h6>
                   <p>21 Savage, Offset, Metro Boomin, Quavo</p>
                 </div>
+                <div class="waveform"></div>
+                <i class="fa-solid fa-play"></i>
                 <i class="fa-solid fa-trash"></i>
               </div>
               <hr />
@@ -127,6 +136,8 @@
                   </h6>
                   <p>Metro Boomin, Future, Chris Brown</p>
                 </div>
+                <div class="waveform"></div>
+                <i class="fa-solid fa-play"></i>
                 <i class="fa-solid fa-trash"></i>
               </div>
               <hr />
@@ -138,6 +149,8 @@
                   <h6>Rap God</h6>
                   <p>Eminem</p>
                 </div>
+                <div class="waveform"></div>
+                <i class="fa-solid fa-play"></i>
                 <i class="fa-solid fa-trash"></i>
               </div>
               <hr />
@@ -149,6 +162,8 @@
                   <h6>amari</h6>
                   <p>J. Cole</p>
                 </div>
+                <div class="waveform"></div>
+                <i class="fa-solid fa-play"></i>
                 <i class="fa-solid fa-trash"></i>
               </div>
               <hr />
@@ -163,6 +178,8 @@
                   <h6>Father Stretch My Hands Pt. 1</h6>
                   <p>Kanye West</p>
                 </div>
+                <div class="waveform"></div>
+                <i class="fa-solid fa-play"></i>
                 <i class="fa-solid fa-trash"></i>
               </div>
               <hr />
@@ -174,6 +191,8 @@
                   <h6>Sky</h6>
                   <p>Playboi Carti</p>
                 </div>
+                <div class="waveform"></div>
+                <i class="fa-solid fa-play"></i>
                 <i class="fa-solid fa-trash"></i>
               </div>
               <hr />
@@ -273,7 +292,7 @@
               <hr />
             </div>
 
-            <div class="content-list prev-songs">
+            <div class="content-list prev-songs" id="prev-songs-playlist1">
               <div class="song-container">
                 <div class="song-cover">
                   <img src="public/images/lean-wit-me.jpg" alt="" />
@@ -282,6 +301,7 @@
                   <h6>Lean Wit Me</h6>
                   <p>Juice WRLD</p>
                 </div>
+                <div class="waveform"></div>
                 <i class="fa-solid fa-plus"></i>
               </div>
               <hr />
@@ -293,6 +313,7 @@
                   <h6>Look At Me!</h6>
                   <p>XXXTENTACION</p>
                 </div>
+                <div class="waveform"></div>
                 <i class="fa-solid fa-plus"></i>
               </div>
               <hr />
@@ -304,6 +325,7 @@
                   <h6>The Grinch</h6>
                   <p>Trippie Redd</p>
                 </div>
+                <div class="waveform"></div>
                 <i class="fa-solid fa-plus"></i>
               </div>
               <hr />
@@ -315,6 +337,7 @@
                   <h6>Flex Up (feat. Future & Playboi Carti)</h6>
                   <p>Lil Yachty, Future, Playboi Carti</p>
                 </div>
+                <div class="waveform"></div>
                 <i class="fa-solid fa-plus"></i>
               </div>
               <hr />
@@ -326,6 +349,7 @@
                   <h6>No Church In The Wild</h6>
                   <p>JAY-Z, Kanye West,Frank Ocean, The-Dream</p>
                 </div>
+                <div class="waveform"></div>
                 <i class="fa-solid fa-plus"></i>
               </div>
               <hr />
@@ -337,6 +361,7 @@
                   <h6>N95</h6>
                   <p>Kendrick Lamar</p>
                 </div>
+                <div class="waveform"></div>
                 <i class="fa-solid fa-plus"></i>
               </div>
               <hr />

@@ -6,7 +6,11 @@
   z-index: 1; /* Stay on the top of the page */
   top: 0; /* Stay at the top of the page */
   left: 0;
-  background-color: #a6a6a6;
+  background: linear-gradient(
+    118.4deg,
+    rgb(122, 35, 52) 27.5%,
+    rgb(62, 9, 27) 92.7%
+  );
   overflow-x: hidden; /* No horizontal scroll */
   padding-top: 20px;
 }
@@ -15,12 +19,12 @@
   padding: 6px 8px 6px 16px;
   text-decoration: none;
   font-size: 25px;
-  color: #333333;
+  color: white;
   display: block;
 }
 
 .sidebar a:hover {
-  color: gold;
+  background-color: #73726b7b;
 }
 
 /* Profile Picture */
@@ -39,7 +43,7 @@
   display: flex;
   flex-direction: column; /* Stack items vertically */
   align-items: center;
-  color: #262626;
+  color: #000;
 }
 
 /* Box Container */
@@ -47,7 +51,7 @@
   height: 200px;
   width: 600px;
   overflow-y: scroll;
-  border: 1px solid gold;
+  border: 1px solid white;
   padding: 10px;
 }
 
@@ -55,19 +59,21 @@
 .song {
   padding: 5px;
   font-size: 30px;
-  border-bottom: 1px solid gray;
+  border-bottom: 1px solid white;
+  color: white;
 }
 
 /* DJ Container */
 .dj {
   padding: 5px;
   font-size: 30px;
-  border-bottom: 1px solid gray;
+  border-bottom: 1px solid white;
   transition: box-shadow 0.3s; /* Add a smooth transition effect */
+  color: white;
 }
 
 .dj.active {
-  box-shadow: 0 0 10px 2px gold;
+  box-shadow: 0 0 10px 2px red;
 }
 
 /* Album Art */
@@ -75,6 +81,13 @@
   width: 50px; /* Set the width of the album image */
   height: 50px; /* Set the height of the album image */
   margin-right: 10px; /* Add margin to separate the image from the text */
+}
+
+.add-button {
+  width: 50px; /* Set the width of the album image */
+  height: 50px; /* Set the height of the album image */
+  margin-right: 10px; /* Add margin to separate the image from the text */
+  float: right;
 }
 
 /* Submit Button */
@@ -96,6 +109,19 @@
 /* Body */
 body {
   font-family: Helvetica, sans-serif;
-  background-color: #737373;
-  color: #333333;
+  background: linear-gradient(
+    135.8deg,
+    rgb(26, 26, 29) 27.1%,
+    rgb(111, 34, 50) 77.5%
+  );
+  color: white;
+}
+
+h1 {
+  color: white;
+}
+
+/* Inline Text */
+.inline {
+  display: inline;
 }

@@ -1,13 +1,20 @@
 // Listener for glow effect
 let selectedElement = null;
 
+// Playlist variables
+let selectedSongs = [];
+let selectedDJ = "";
+let startTimeInput;
+let endTimeInput;
+
 function toggleActive(element) {
   if (selectedElement) {
     selectedElement.classList.remove("active");
   }
-
   element.classList.add("active");
   selectedElement = element;
+  selectedDJ = element.textContent.trim();
+  console.log(selectedDJ);
 }
 
 // Validate time format (hh:mm)
@@ -17,8 +24,8 @@ function isValidTimeFormat(time) {
 
 // Compare start and end times
 function validateTimes() {
-  const startTimeInput = document.getElementById("start_time");
-  const endTimeInput = document.getElementById("end_time");
+  startTimeInput = document.getElementById("start_time");
+  endTimeInput = document.getElementById("end_time");
   const errorMessage = document.getElementById("error-message");
   const errorPopup = document.getElementById("error-popup");
 
@@ -39,6 +46,41 @@ function validateTimes() {
   }
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+  document
+    .getElementById("timeslot_button")
+    .addEventListener("click", validateTimes);
+});
+
+// Submit button event listener
+document.addEventListener("DOMContentLoaded", () => {
+  // Submit button event listener
+  document
+    .getElementById("submit-button")
+    .addEventListener("click", async () => {
+      // I have tried for hours to get this to work and it just
+      const playlistData = {
+        // refuses to do it. Leaving it as is.
+        name: "TODO",
+        songs: selectedSongs,
+        dj_name: selectedDJ,
+        start_time: startTimeInput.value,
+        end_time: endTimeInput.value,
+      };
+      try {
+        const response = await fetch("/database/playlist", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(playlistData),
+        });
+      } catch (error) {
+        console.error("Error submitting playlist:", error);
+      }
+    });
+});
+
 // Show the error pop-up
 function showErrorPopup(errorPopup) {
   errorPopup.style.display = "block";
@@ -47,23 +89,4 @@ function showErrorPopup(errorPopup) {
   setTimeout(function () {
     errorPopup.style.display = "none";
   }, 10000);
-}
-
-// Add songs to playlist
-function addSong(clickedSong) {
-  // Get the song element that was clicked
-  const songElement = clickedSong.parentElement;
-
-  // Clone the song element to add it to the playlist
-  const newSongElement = songElement.cloneNode(true);
-
-  // Remove the "add" image from the cloned element
-  const addImageClone = newSongElement.querySelector("img[src='img/add.png']");
-  if (addImageClone) {
-    addImageClone.remove();
-  }
-
-  // Add the cloned song element to the current playlist
-  const currentPlaylist = document.querySelector(".container");
-  currentPlaylist.appendChild(newSongElement);
 }
